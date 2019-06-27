@@ -567,30 +567,32 @@ func (s *sessionTCP) sendPong(w ResponseWriter, r *Request) error {
 func (s *sessionTCP) handleSignals(w ResponseWriter, r *Request) bool {
 	switch r.Msg.Code() {
 	case CSM:
-		maxmsgsize := uint32(maxMessageSize)
-		if size, ok := r.Msg.Option(MaxMessageSize).(uint32); ok {
-			s.setPeerMaxMessageSize(size)
-			maxmsgsize = size
-		}
-		if r.Msg.Option(BlockWiseTransfer) != nil {
-			s.setPeerBlockWiseTransfer(true)
-			startIter := s.blockWiseSzx()
-			if startIter == BlockWiseSzxBERT {
-				if szxToBytes[BlockWiseSzx1024] < int(maxmsgsize) {
-					s.setBlockWiseSzx(BlockWiseSzxBERT)
-					return true
+		/*
+				maxmsgsize := uint32(maxMessageSize)
+				if size, ok := r.Msg.Option(MaxMessageSize).(uint32); ok {
+					s.setPeerMaxMessageSize(size)
+					maxmsgsize = size
 				}
-				startIter = BlockWiseSzx512
-			}
-			for i := startIter; i > BlockWiseSzx16; i-- {
-				if szxToBytes[i] < int(maxmsgsize) {
-					s.setBlockWiseSzx(i)
-					return true
-				}
-			}
-			s.setBlockWiseSzx(BlockWiseSzx16)
-		}
 
+			if r.Msg.Option(BlockWiseTransfer) != nil {
+				s.setPeerBlockWiseTransfer(true)
+				startIter := s.blockWiseSzx()
+				if startIter == BlockWiseSzxBERT {
+					if szxToBytes[BlockWiseSzx1024] < int(maxmsgsize) {
+						s.setBlockWiseSzx(BlockWiseSzxBERT)
+						return true
+					}
+					startIter = BlockWiseSzx512
+				}
+				for i := startIter; i > BlockWiseSzx16; i-- {
+					if szxToBytes[i] < int(maxmsgsize) {
+						s.setBlockWiseSzx(i)
+						return true
+					}
+				}
+				s.setBlockWiseSzx(BlockWiseSzx16)
+			}
+		*/
 		return true
 	case Ping:
 		if r.Msg.Option(Custody) != nil {
