@@ -9,6 +9,7 @@ import (
 	"io"
 	"net"
 	"strings"
+	"syscall"
 	"time"
 
 	coapNet "github.com/go-ocf/go-coap/net"
@@ -304,7 +305,18 @@ func (c *Client) DialWithContextLocaladdr(ctx context.Context, address string, l
 	var network string
 	var sessionUPDData *coapNet.ConnUDPContext
 
-	dialer := &net.Dialer{Timeout: c.DialTimeout, LocalAddr: localaddr}
+	dialer := &net.Dialer{
+		Timeout: c.DialTimeout,
+		Control: func(network, address string, c syscall.RawConn) (err error) {
+			return c.Control(func(fd uintptr) {
+				err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
+				if err != nil {
+					return
+				}
+			})
+		},
+		LocalAddr: localaddr,
+	}
 	BlockWiseTransfer := false
 	BlockWiseTransferSzx := BlockWiseSzx1024
 	multicast := false
