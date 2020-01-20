@@ -313,6 +313,10 @@ func (c *Client) DialWithContextLocaladdr(ctx context.Context, address string, l
 				if err != nil {
 					return
 				}
+				err = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEPORT, 1)
+				if err != nil {
+					return
+				}
 			})
 		},
 		LocalAddr: localaddr,
